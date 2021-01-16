@@ -1,0 +1,8 @@
+BEGIN TRANSACTION;
+
+CREATE TABLE myPlayers (
+  username VARCHAR(50) PRIMARY KEY NOT NULL,
+  playerList JSON 
+);
+
+COMMIT;

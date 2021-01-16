@@ -1,0 +1,31 @@
+version: '3.9'
+
+services:
+
+  # Backend API
+  draftboard-api:
+    container_name: draftboard-api
+    build: ./
+    command: npm start
+    working_dir: /usr/src/draftboard-api
+    environment:
+      POSTGRES_URI: postgres://draftboard-admin:notadmin@postgres:5432/draftboard-db
+      REDIS_URI: redis://redis:6379
+      JWT_SECRET: "tu_m'as_vu_mais_tu_n'as_pas_me_regarder"
+    ports: ['3000:3000']
+    volumes: [./:/usr/src/draftboard-api, /usr/src/draftboard-api/node_modules/]
+
+  # Postgres Database
+  postgres:
+    environment:
+      POSTGRES_USER: draftboard-admin
+      POSTGRES_PASSWORD: notadmin
+      POSTGRES_DB: draftboard-db
+      POSTGREST_HOST: postgres
+    build: ./database
+    ports: ['5431:5432']
+
+  # Redis DB
+  redis:
+    image: redis
+    ports: ['6379:6379']
