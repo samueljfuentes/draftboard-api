@@ -1,9 +1,9 @@
 const getPlayers = async (database, fetch, req) => {
   const username = req.body.userid ? req.body.username : 'guest';
-  console.log(username);
-  const myPlayers = database.select('*').from('myplayers').where('username', '=', username)
+  let myPlayers = await database.select('*').from('myplayers').where('username', '=', username)
     // .then(data => data)
     .catch('!*!*!*!*!');
+  myPlayers = myPlayers.length ? myPlayers[0].playerlist : [];
   try {
     // check if any relations exist in all players table ie: previous user...
     const exists = await database.schema.hasTable('allPlayers'); 
@@ -52,7 +52,7 @@ const getPlayers = async (database, fetch, req) => {
           
           return {
             allPlayers:[...allPlayers],
-            myPlayers: await myPlayers
+            myPlayers: [...myPlayers]
           }
         })
       })
@@ -62,7 +62,7 @@ const getPlayers = async (database, fetch, req) => {
       console.log('table existed and returning all players');
       const allPlayers = await database.select('*').from('allPlayers');
       return {
-        myPlayers: await myPlayers,
+        myPlayers: [...myPlayers],
         allPlayers: [...allPlayers]
       }
     }
@@ -81,7 +81,11 @@ const addPlayer = async (database, req) => {
   let newPlayer = {
     ...player,
     tier: 10,
-    rank: userTable.length ? userTable[0].playerlist.length + 1 : 1
+    rank: userTable.length ? 
+      // userTable[0].playerlist.length + 1 : 1
+      // the new players rank should be one more than the lowest ranked player of = position, ie: length + 1
+      userTable[0].playerlist.filter(myPlayer => myPlayer.position === player.position).length + 1 :
+      1
   };
   
 
