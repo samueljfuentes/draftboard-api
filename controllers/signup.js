@@ -1,5 +1,7 @@
+const jwt = require('jsonwebtoken');
+const redisClient = require('../middlewares/authorization').redisClient;
+
 const registerUser = (database, bcrypt, req, res) => {
-  console.log(req.body);
   const { username, password, passwordConfirm } = req.body;
   // sanitize sign up form data...
   if (!username || !password || (password !== passwordConfirm)) {
@@ -28,33 +30,37 @@ const registerUser = (database, bcrypt, req, res) => {
     // rollback returns a rejected promise as well as reverting database...
     trx.rollback(error)
   }
+};
 
-  // return Promise.resolve("resolving...");
-  
-  // database.transaction(trx => {
-  //   trx.insert({
-  //     username,
-  //     hash
-  //   })
-  //   .into('login').returning('username')
-  //   .then(loginusername => {
-  //     return trx('users').returning('*').insert({
-  //       username: loginusername[0],
-  //       joined: new Date()
-  //     })
-  //     .then(user => res.json(user[0]))
-  //     .catch(err => {res.status(400).json(err)})
-  //   })
-  //   .then(trx.commit)
-  //   .catch(trx.rollback)
-  // })
-  // .catch(err => res.status(400).json('Unable to Register'));
+const signToken = (username) => {
+  const payload = {username};
+  return jwt.sign(payload, process.env.JWT_SECRET);
+};
+
+const setToken = (key, value) => {
+  return new Promise((resolve, reject) => {
+    resolve(redisClient.set(key, value));
+    reject('Session Error');
+  })
+};
+
+const createSession = (user) => {
+  const {userid, username} = user;
+  const token = signToken(username);
+  return setToken(token, userid).then(() => {
+    return {
+      success: true,
+      user,
+      token
+    }
+  }).catch(err => console.log(err));
 };
 
 // MAIN HANDLER; ALL RESPONSES HERE
 const handleSignUp = (database, bcrypt) => (req, res) => {
   registerUser(database, bcrypt, req, res)
-    .then(user => res.json(user))
+    .then(user => createSession(user))
+    .then(session => res.json(session))
     .catch(err => res.status(400).json(`Signup Failed: ${err}`))
 };
 

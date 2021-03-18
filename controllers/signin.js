@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
-const redis = require('redis');
+const redisClient = require('../middlewares/authorization').redisClient;
 
-const redisClient = redis.createClient(process.env.REDIS_URI);
 
 // VERIFY LOGIN CREDENTIALS AND RETURN USER...
 const validateCredentials = async (database, bcrypt, req, res) => {
@@ -84,5 +83,4 @@ const handleSignIn = (database, bcrypt) => (req, res) => {
 
 module.exports = {
   handleSignIn,
-  redisClient
 };

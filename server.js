@@ -19,7 +19,6 @@ const database = knex({
   connection: process.env.POSTGRES_URI
 });
 
-
 const app = express();
 
 app.use(cors());
@@ -32,6 +31,8 @@ app.get('/profile/:userid', auth.requireAuth, profile.handleProfileGet(database)
 // app.get('/findProfile', auth.requireAuth, profile.findProfile(database))
 app.post('/draftboard', draftboard.handleGetPlayers(database, fetch));
 app.post('/addplayer', draftboard.handleAddMyPlayer(database));
+app.post('/removeplayer', draftboard.handleRemoveMyPlayer(database));
+app.post('/updatemyplayers', draftboard.handleUpdateMyPlayers(database));
 
 app.listen(3000, () => {
   console.log('APP IS RUNNING ON PORT 3000!')

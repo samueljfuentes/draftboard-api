@@ -115,7 +115,51 @@ const addPlayer = async (database, req) => {
   }
 };
 
-// MAIN HANDLERS
+const removePlayer = async (database, req) => {
+  const { username, player } = req.body;
+  let userInfo = await database.select('*').from('myplayers').where('username', '=', username);
+  const userMyPlayers = userInfo[0].playerlist;
+  const newMyPlayers = userMyPlayers.filter(myPlayer => myPlayer.playerId !== player.playerId && myPlayer.displayName !== player.displayName).map(newMyPlayer => {
+    if (newMyPlayer.position === player.position && newMyPlayer.rank > player.rank) {
+      return {
+        ...newMyPlayer,
+        rank: newMyPlayer.rank - 1
+      }
+    }
+    else {
+      return {
+        ...newMyPlayer
+      }
+    }
+  });
+  
+  try {
+    return await database.transaction(async trx => {
+      return await trx('myplayers').where('username', '=', username).update({
+        playerlist: JSON.stringify(newMyPlayers)
+      }, ['playerlist'])
+    });
+  }
+  catch {
+    trx.rollback(error);
+  }
+};
+
+const updateMyPlayers = async (database, req) => {
+  const {username, myPlayerList} = req.body;
+  try {
+    return await database.transaction(async trx => {
+      return await trx('myplayers').where('username', '=', username).update({
+        playerlist: JSON.stringify(myPlayerList)
+      }, ['playerlist'])
+    });
+  }
+  catch (error) {
+    trx.rollback();
+  }
+};
+
+// MAIN HANDLERS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 const handleGetPlayers = (database, fetch) => (req, res) => {
   getPlayers(database, fetch, req)
   .then(players => res.json(players))
@@ -128,7 +172,21 @@ const handleAddMyPlayer = (database) => (req, res) => {
   .catch(err => res.status(400).json(err))
 };
 
+const handleRemoveMyPlayer = (database) => (req, res) => {
+  removePlayer(database, req)
+  .then(data => res.json(data[0].playerlist))
+  .catch(err => res.status(400).json(err))
+};
+
+const handleUpdateMyPlayers = (database) => (req, res) => {
+  updateMyPlayers(database, req)
+  .then(data => res.json(data))
+  .catch(err => res.status(400).json(err))
+}
+
 module.exports = {
   handleGetPlayers: handleGetPlayers,
-  handleAddMyPlayer: handleAddMyPlayer
+  handleAddMyPlayer: handleAddMyPlayer,
+  handleRemoveMyPlayer: handleRemoveMyPlayer,
+  handleUpdateMyPlayers: handleUpdateMyPlayers
 };

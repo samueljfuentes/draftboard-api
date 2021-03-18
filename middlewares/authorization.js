@@ -1,4 +1,6 @@
-const redisClient = require('../controllers/signin').redisClient;
+const redis = require('redis');
+
+const redisClient = redis.createClient(process.env.REDIS_URI);
 
 const requireAuth = (req, res, next) => {
   const { authorization } = req.headers;
@@ -14,5 +16,6 @@ const requireAuth = (req, res, next) => {
 };
 
 module.exports = {
+  redisClient,
   requireAuth
 }

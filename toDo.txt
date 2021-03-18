@@ -6,19 +6,27 @@
   !!!3) load myPlayers on signin and filter out of allPlayers...
   !!!4) fix drag and drop functionality..
   !!!5) allow tier modification...
-  6) allow guest to add to my players (fix refresh issue again)...
+  !!!6) allow guest to add to my players (fix refresh issue again)...
   !!!7) figure out position switching bug (after adding player of certain postion, can only see that position in all players after)...
   !!!8) fix the ranking when sorting my players, sort each position separately...
 )
-save my players?
-remove player 
-profile page
+
+
+!!!remove player
+!!!remove player as guest 
+!!!update database when tier is changed
+!!!set signup tokens
+!!!modal
+profile page (username, user since, # of my players)
+sign out
 clear all players
 search players
 modify players via direct input
 verify player table sort/organize functions...
+
+***put online, verify config is correct***
+
 redesign front end
-put online, verify config is correct
 * write tests
 * find non dummy data
 * add user profile features
