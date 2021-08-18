@@ -1,4 +1,11 @@
 !!!set up my player database
+(
+  !!1) recreate table in initial draftboard call to reflect new source API
+  !!2) create database on heroku
+  3) upload dockerized backend api to heroku, and connect to database;
+  4) postman production database and api
+)
+
 !!!add player
 ( 
   !!!1) make sure myPlayers cant be repeated, either remove from all players or check during request...
@@ -17,16 +24,25 @@
 !!!update database when tier is changed
 !!!set signup tokens
 !!!modal
-profile page (username, user since, # of my players)
+!!!profile page (username, user since, # of my players, clear all players)
+
+(
+
+  *** ISSUE IS ONTOUCHSTART COMPONENT IS REMOUNTING AND REFRESHING TO TOP OF PAGE...maybe not...
+  *** dont re-render table/rows when dragged player changes
+  *** look to use the useState hook in myplayerrow component, seems to be only one that uses draggedPlayer...
+  -----------------------------------------------------
+  1. implement touch and hold delay...
+  3. add touch styling for dragged elements...
+)
 sign out
 clear all players
+***put online, verify config is correct***
 search players
 modify players via direct input
 verify player table sort/organize functions...
 
-***put online, verify config is correct***
 
-redesign front end
 * write tests
 * find non dummy data
 * add user profile features

@@ -13,10 +13,16 @@ const profile = require('./controllers/profile');
 const draftboard = require('./controllers/draftboard');
 
 
+let connectionVar;
+if (process.env.DATABASE_URL) {
+  connectionVar = process.env.DATABASE_URL;
+} else {
+  connectionVar = process.env.POSTGRES_URI;
+}
 
 const database = knex({
   client: 'pg',
-  connection: process.env.POSTGRES_URI
+  connection: process.env.POSTGRES_URI 
 });
 
 const app = express();
@@ -34,6 +40,7 @@ app.post('/addplayer', draftboard.handleAddMyPlayer(database));
 app.post('/removeplayer', draftboard.handleRemoveMyPlayer(database));
 app.post('/updatemyplayers', draftboard.handleUpdateMyPlayers(database));
 
-app.listen(3000, () => {
+
+app.listen(process.env.PORT || 3000, () => {
   console.log('APP IS RUNNING ON PORT 3000!')
 });

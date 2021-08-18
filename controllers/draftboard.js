@@ -12,7 +12,7 @@ const getPlayers = async (database, fetch, req) => {
       let players;
       // contact 3rd party API for players...
       const proxyURL = "https://salty-caverns-26864.herokuapp.com/";
-      const testURL = "https://www.fantasyfootballnerd.com/service/players/json/test/"
+      const testURL = "https://api.fantasynerds.com/v1/nfl/players?apikey=TEST"
       let response = await fetch(testURL, {
         method: 'GET',
         headers: {
@@ -21,7 +21,8 @@ const getPlayers = async (database, fetch, req) => {
         }
       });
       players = await response.json();
-      players = players.Players;
+      players = players.filter(player => player.position === "QB" || player.position === "RB" || player.position === "WR" || player.position === "TE");
+      
       
       // start a database transaction and to create and return all players...
       return await database.transaction(async trx => {
@@ -30,9 +31,7 @@ const getPlayers = async (database, fetch, req) => {
           table.integer('playerId').primary().notNullable();
           table.string('displayName', 100).notNullable();
           table.string('position', 5).notNullable();
-          table.integer('jersey').notNullable();
-          table.string('firstName', 50);
-          table.string('lastName', 50);
+          table.string('team', 10);
         }).then(async () => {
           console.log('created table and inserting then returning all new Players...')
           // insert all players in database and return all players as a promise...
@@ -41,11 +40,9 @@ const getPlayers = async (database, fetch, req) => {
             players.map(player => {
               return {
                 playerId: player.playerId,
-                displayName: player.displayName,
+                displayName: player.name,
                 position: player.position,
-                jersey: player.jersey,
-                firstName: player.fname,
-                lastName: player.lname
+                team: player.team
               }  
             })
           ).into('allPlayers').returning('*');
@@ -159,6 +156,11 @@ const updateMyPlayers = async (database, req) => {
   }
 };
 
+const testDB = async (database) => {
+  console.log('HITTING DB...')
+  return await database.select('*').from('users');
+}
+
 // MAIN HANDLERS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 const handleGetPlayers = (database, fetch) => (req, res) => {
   getPlayers(database, fetch, req)
@@ -180,7 +182,10 @@ const handleRemoveMyPlayer = (database) => (req, res) => {
 
 const handleUpdateMyPlayers = (database) => (req, res) => {
   updateMyPlayers(database, req)
-  .then(data => res.json(data))
+  .then(data => {
+    console.log('DB WAS HIT, returned something');
+    res.json(data)
+  })
   .catch(err => res.status(400).json(err))
 }
 
