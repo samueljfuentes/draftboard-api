@@ -1,7 +1,11 @@
 setup:
   addons:
     - plan: heroku-postgresql
+  config:
+    SETUP_VAR: test-var
 
 build:
   docker:
     web: Dockerfile
+  config:
+    BUILD_VAR: development

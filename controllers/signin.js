@@ -22,6 +22,8 @@ const validateCredentials = async (database, bcrypt, req, res) => {
 
   const isValid = await bcrypt.compare(password, login[0].hash);
 
+  console.log(isValid);
+
   return isValid ? user[0] : Promise.reject('Invalid credentials');
 };
 
@@ -40,6 +42,7 @@ const getAuthTokenID = (req, res) => {
 const signToken = (username) => {
   // set info inside jwt as the username and return token...
   const jwtPayload = { username }
+  console.log(process.env.JWT_SECRET);
   return jwt.sign(jwtPayload, process.env.JWT_SECRET)
 };
 
@@ -54,8 +57,11 @@ const createSessions = (user) => {
   const { username, userid } = user;
   // sign token using the username (data contained in token)...
   const token = signToken(username);
+  console.log(token);
 
   return setToken(token, userid).then(() => {
+    console.log(token);
+    console.log(userid);
     return {
       success: true,
       userid,
@@ -68,6 +74,8 @@ const createSessions = (user) => {
 const handleSignIn = (database, bcrypt) => (req, res) => {
   const { authorization } = req.headers;
   
+  console.log(authorization);
+
   return authorization ? 
     getAuthTokenID(req, res)
     .then(data => res.json(data))
@@ -75,6 +83,7 @@ const handleSignIn = (database, bcrypt) => (req, res) => {
     :
     validateCredentials(database, bcrypt, req, res)
     .then(user => {
+      console.log(user);
       return user.userid && user.username ? createSessions(user) : Promise.reject(user)
     })
     .then(session => res.json(session))

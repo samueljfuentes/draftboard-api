@@ -9,8 +9,8 @@ services:
     command: npm start
     working_dir: /usr/src/draftboard-api
     environment:
-      POSTGRES_URI: postgres://draftboard-admin:notadmin@postgres:5432/draftboard-db
-      REDIS_URI: redis://redis:6379
+      POSTGRES_URL: postgres://draftboard-admin:notadmin@postgres:5432/draftboard-db
+      REDIS_URL: redis://redis:6379
       JWT_SECRET: "tu_m'as_vu_mais_tu_n'as_pas_me_regarder"
     ports: ['3000:3000']
     volumes: [./:/usr/src/draftboard-api, /usr/src/draftboard-api/node_modules/]

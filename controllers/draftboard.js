@@ -12,12 +12,12 @@ const getPlayers = async (database, fetch, req) => {
       let players;
       // contact 3rd party API for players...
       const proxyURL = "https://salty-caverns-26864.herokuapp.com/";
-      const testURL = "https://api.fantasynerds.com/v1/nfl/players?apikey=TEST"
+      const testURL = "https://api.fantasynerds.com/v1/nfl/players?apikey=TEST&include_inactive="
       let response = await fetch(testURL, {
         method: 'GET',
         headers: {
           'content-type': 'application/json',
-          'origin': proxyURL
+          // 'origin': proxyURL
         }
       });
       players = await response.json();
